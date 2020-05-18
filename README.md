@@ -1,6 +1,7 @@
 <!-- #region -->
 # Ground Motion Displacement RMS vs Time
 
+![run notebooks](https://github.com/ANU-RSES-Education/SeismicNoise_AuSIS/workflows/run%20notebooks/badge.svg)
 
 This repository is a self-updating version of the [seismic social-distancing "monitoring" toolkit](https://github.com/ThomasLecocq/SeismoRMS) of Thomas Lecocq, Fred Massin, and Claudio Satriano that was designed to show the effect on seismic noise of stay-at-home orders for the COVID19 emergency. The notebook software is bundled with some code to trigger github actions to download any new data and update the images in this README file.
 
