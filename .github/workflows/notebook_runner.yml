@@ -1,0 +1,70 @@
+name: run notebooks
+
+# push or on schedule
+on:
+
+  schedule: 
+    - cron:  '0 17 * * *'  # Every day at 5pm UTC - early am AuSIS time 
+
+  push: 
+    
+jobs:
+  # This workflow contains a single job called "build"
+  compute:
+    name: Run notebook and upload result.
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+  
+    - uses: goanpeca/setup-miniconda@v1
+      with:
+        auto-update-conda: true
+        python-version: 3.7
+
+    - name: Install dependencies with conda # (the shell line is needed for conda paths etc)
+      shell: bash -l {0}
+      run: |
+        conda env update -n base --file environment.yml
+        conda activate base 
+        pip install tables
+
+    - name: Run the code
+      shell: bash -l {0}
+      run: |
+        conda activate base 
+        ./notebook_runner.sh &> output_log.txt
+        ls -l workdir  # add this to the logs for debugging / monitoring 
+
+    - name: Upload the log files (for now just an artefact)
+      uses: actions/upload-artifact@v1
+      with:
+        name: logs
+        path: output_log.txt
+
+    - name: Upload the image files 
+      uses: actions/upload-artifact@v1
+      with:
+        name: figures-etc
+        path: results
+   
+    - name: Commit files 
+      run: |
+        git config --local user.email "diablo@underworldcode.org"
+        git config --local user.name "ProfessorDiablobot"
+        git add results/*.png
+        git add data/*npz 
+        git add results/*.csv
+        git commit -m "Updated results: `date` " 
+
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+
+    
+
+      

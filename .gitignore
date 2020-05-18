@@ -1,0 +1,16 @@
+data/*.mseed
+workdir/*.mseed
+/*.mseed 
+/*.npz
+
+# *.*.*.*.pdf
+*.*.*.*.png
+*.*.*.*.csv
+.ipynb_checkpoints
+
+__pycache__
+
+*checkpoint*
+*autogen*
+
+workdir/*.py
