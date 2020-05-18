@@ -33,4 +33,6 @@ Documentation will be available soon.
 
 ```python
 
+!ls
+
 ```
