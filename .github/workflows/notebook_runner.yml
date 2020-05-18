@@ -52,6 +52,7 @@ jobs:
         path: results
    
     - name: Commit files 
+      continue-on-error: true  # Usually indicates nothing has change / nothing nees to be committed.
       run: |
         git config --local user.email "diablo@underworldcode.org"
         git config --local user.name "ProfessorDiablobot"
@@ -61,6 +62,7 @@ jobs:
         git commit -m "Updated results: `date` " 
 
     - name: Push changes
+      continue-on-error: true
       uses: ad-m/github-push-action@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
