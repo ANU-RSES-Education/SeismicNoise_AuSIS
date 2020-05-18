@@ -34,6 +34,8 @@ Once you fork a copy of the repository, you should update the settings in the `n
 
 To run the notebook to check everything is ok just run the `notebook_runner.sh` script. This will download all the data, process it and build the plots. You can check in the .npz files in the data directory to save time when the scripts run online, but you should avoid checking in the large `data/*mseed` files or anything that is located in `workdir`. By default, these files will be ignored by git.
 
+Don't forget to update this README.md file !
+
 ### AuSIS stations
 
 A list of the AuSIS stations can be obtained with this code snippet. 
