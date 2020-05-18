@@ -32,7 +32,7 @@ This is a template repository that you can fork to monitor a single seismic stat
 
 Once you fork a copy of the repository, you should update the settings in the `notebooks/seismosocialdistancing_settings.py` file. The settings allow you to choose a station, the time period of the plot (including setting some sliding window such as *one year ago to today*, the description for the charts, and the signficicant dates for school bans or holidays. The final entry in the list of signficicant dates is considered the cross-over between *before* and *after* for the point of view of comparing the noise signatures.
 
-To run the notebook to check everything is ok just run the `notebook_runner.sh` script. This will download all the data, process it and build the plots. You can check in the .npz files in the data directory to save time when the scripts run online, but you should avoid checking in the large `data/*mseed` files or anything that is located in `workdir`. By default, these files will be ignored by git.
+To run the notebook to check everything is ok just run the `notebook_runner.sh` script. This will download all the data, process it and build the plots. You can check in the .npz files in the data directory to save time when the scripts run online, but you should avoid checking in the large `data/*mseed` files or anything that is located in `workdir`. By default, these files will be ignored by git. Take care that the github actions will update the repository. You should pull before editing.
 
 Don't forget to update this README.md file !
 
