@@ -24,18 +24,20 @@ jobs:
       with:
         auto-update-conda: true
         python-version: 3.7
+        activate-environment: ausis
+        environment-file: environment.yml
+        auto-activate-base: false
 
     - name: Install dependencies with conda # (the shell line is needed for conda paths etc)
       shell: bash -l {0}
       run: |
-        conda env update -n base --file environment.yml
-        conda activate base 
         pip install tables
+        conda info 
+        conda list
 
     - name: Run the code
       shell: bash -l {0}
       run: |
-        conda activate base 
         ./notebook_runner.sh &> output_log.txt
         ls -l workdir  # add this to the logs for debugging / monitoring 
 
