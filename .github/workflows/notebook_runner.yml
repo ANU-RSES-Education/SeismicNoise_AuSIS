@@ -38,7 +38,7 @@ jobs:
     - name: Run the code
       shell: bash -l {0}
       run: |
-        ./notebook_runner.sh &> output_log.txt
+        ./notebook_runner.sh # &> output_log.txt
         ls -l workdir  # add this to the logs for debugging / monitoring 
 
     - name: Upload the log files (for now just an artefact)
