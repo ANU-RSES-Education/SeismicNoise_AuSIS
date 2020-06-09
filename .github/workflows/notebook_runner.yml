@@ -20,7 +20,7 @@ jobs:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
   
-    - uses: goanpeca/setup-miniconda@v1
+    - uses: goanpeca/setup-miniconda@v1.5.0
       with:
         auto-update-conda: true
         python-version: 3.7
@@ -38,7 +38,7 @@ jobs:
     - name: Run the code
       shell: bash -l {0}
       run: |
-        ./notebook_runner.sh # &> output_log.txt
+        ./notebook_runner.sh &> output_log.txt
         ls -l workdir  # add this to the logs for debugging / monitoring 
 
     - name: Upload the log files (for now just an artefact)
