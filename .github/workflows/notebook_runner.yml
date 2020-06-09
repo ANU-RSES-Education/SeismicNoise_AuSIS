@@ -42,6 +42,7 @@ jobs:
         ls -l workdir  # add this to the logs for debugging / monitoring 
 
     - name: Upload the log files (for now just an artefact)
+      continue-on-error: true  # Usually indicates nothing has change / nothing nees to be committed.
       uses: actions/upload-artifact@v1
       with:
         name: logs
