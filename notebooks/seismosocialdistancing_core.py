@@ -594,10 +594,22 @@ def gridmap(data,
     return ax
 
 days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday','Saturday','Sunday']
+
 # Just a bunch of helper functions
+
 def stack_wday_time(df,scale):
     """Takes a DateTimeIndex'ed DataFrame and returns the unstaked table: hours vs day name"""
-    return df.groupby(level=(0,1)).median().unstack(level=-1).T.droplevel(0)[days]*scale
+    
+    # The error messages on failure are more meaningful if we do this line by line
+    g = df.groupby(level=(0,1))
+    gm = g.median()
+    gmu = gm.unstack(level=-1)
+    gmut = gmu.T
+    gmutd = gmut.droplevel(0)
+    gmutdd = gmutd[days] 
+    
+    
+    return gmutdd*scale
 
 def clock24_plot_commons(ax,unit='nm'):
     # Set the circumference labels
@@ -612,8 +624,9 @@ def clock24_plot_commons(ax,unit='nm'):
 
     # Place 0 at the top
     ax.set_theta_offset(np.pi/2.0)
-    plt.xlabel("Hour (local time)", fontsize=10)
-    plt.grid(True)
+    ax.grid(True)
+    ax.set_xlabel("Hour (local time)", fontsize=10.0)
+#     plt.grid(True)
 
 def radial_hours(N):
     hours = np.deg2rad(np.linspace(0, 360, N-1, endpoint=False))
@@ -631,15 +644,20 @@ def plot(displacement_RMS,
          type = '*',
          scale = 1e9,
          unit = 'nm',
-         time_zone = "Europe/Brussels",
-         sitedesc = "",# "in Uccle (Brussels, BE)", in original example
+         time_zone = "Australia/Canberra",
+         sitedesc = "", # e.g. "Seismometers in Schools ... School Name,Location"
          show = True,
          save = None,
          format = 'pdf',
          self = None,
          data_provider='ETH',
          basename=None,
+         reference_period=None,
+         lockdown_period=None,
+         reopening_date=None,
+         holiday_period=None,
          ):
+    
     if save is not None and not os.path.isdir(save):
         os.makedirs(save)
 
@@ -774,12 +792,27 @@ def plot(displacement_RMS,
             if show:
                 plt.show()
         
-        if type in ['*', 'all', 'clockplots', 'dailyplots']:
+        if type in ['*', 'all', 'clockplots', 'dailyplots', 'sclockplots']:
             preloc = data[main].loc[:max(list(bans.keys()))]
             preloc = preloc.set_index([preloc.index.day_name(), preloc.index.hour+preloc.index.minute/60.])
             postloc = data[main].loc[max(list(bans.keys())):]
             postloc = postloc.set_index([postloc.index.day_name(), postloc.index.hour+postloc.index.minute/60.])
             cmap = plt.get_cmap("tab20")
+            
+            
+            reference = data[main].loc[reference_period["start"]:reference_period["end"]]
+            reference = reference.set_index([reference.index.day_name(), reference.index.hour+reference.index.minute/60.])
+            
+            lockdown  = data[main].loc[lockdown_period["start"]:lockdown_period["end"]]
+            lockdown  = lockdown.set_index([lockdown.index.day_name(), lockdown.index.hour+lockdown.index.minute/60.])
+            
+            holiday   = data[main].loc[holiday_period["start"]:holiday_period["end"]]
+            holiday   = holiday.set_index([holiday.index.day_name(), holiday.index.hour+holiday.index.minute/60.])
+        
+            reopened = data[main].loc[reopening_date["start"]:]
+            reopened = reopened.set_index([reopened.index.day_name(), reopened.index.hour+reopened.index.minute/60.])
+
+          
 
             if type in ['*', 'all', 'dailyplots']:
                 ax = stack_wday_time(preloc,scale).plot(figsize=(14,8), cmap = cmap)
@@ -837,6 +870,7 @@ def plot(displacement_RMS,
                                          channelcode[:]+main[-1],
                                          band),
                              fontsize=16)
+                
                 plt.subplots_adjust(top=0.80)
                 if save is not None:
                     fig = ax.figure
@@ -846,6 +880,106 @@ def plot(displacement_RMS,
                 if show:
                     plt.show()
 
+                    
+            if type in ['sclockplots']:
+                
+                # Polar/clock Plot:
+
+                
+                radial_scale = np.nanpercentile(data[main],95)*1.5*scale
+                print("clock plot - radial scale: {} nm".format(radial_scale))
+
+                fig, axgrid = plt.subplots(ncols=2, nrows=2, figsize=(12,13), 
+                                           subplot_kw={'polar': True})
+
+                
+                ## REFERENCE
+                              
+                ax = axgrid[0,0]
+                ax.set_ylim((0.0,radial_scale))
+                ax.title.set_text('Reference')
+  
+                _ = stack_wday_time(reference,scale).copy()
+                _.loc[len(_)+1] = _.iloc[0]
+                _.index = radial_hours(len(_))
+                _.plot(ax=ax)#es[0])
+
+                # plt.title("Reference", fontsize=12)
+                clock24_plot_commons(ax,unit=unit)#es[0])
+                          
+                  
+                ## HOLIDAY
+                    
+                ax=axgrid[0,1]
+                ax.set_ylim((0.0,radial_scale))
+                ax.title.set_text('Holiday')
+                
+                if len(holiday):
+                    _ = stack_wday_time(holiday,scale).copy()
+                    _.loc[len(_)+1] = _.iloc[0]
+                    _.index = radial_hours(len(_))
+                    _.plot(ax=ax,#es[0], 
+                           ls="--")
+                    
+                clock24_plot_commons(ax,unit=unit)#es[0])
+
+                    
+                    
+                ## LOCKDOWN
+                 
+                ax=axgrid[1,0]
+                ax.set_ylim((0.0,radial_scale))
+                ax.title.set_text('Lockdown')
+ 
+                
+                if len(lockdown):
+                    _ = stack_wday_time(lockdown,scale).copy()
+                    _.loc[len(_)+1] = _.iloc[0]
+                    _.index = radial_hours(len(_))
+                    _.plot(ax=ax,#es[0], 
+                           ls="--")
+    
+                ax.title.set_text('Lockdown')
+                clock24_plot_commons(ax,unit=unit)
+            
+                ## REOPENING
+                
+                # ax = plt.subplot(224, polar=True, sharey=ax)
+                ax=axgrid[1,1]
+                ax.set_ylim((0.0,radial_scale))
+                ax.title.set_text('Re-opened')
+ 
+                
+                if len(reopened):
+                    _ = stack_wday_time(reopened,scale).copy()
+                    _.loc[len(_)+1] = _.iloc[0]
+                    _.index = radial_hours(len(_))
+                    _.plot(ax=ax,#es[0], 
+                           ls="--")
+    
+                clock24_plot_commons(ax,unit=unit)
+        
+                ## TITLE FOR ALL PLOTS
+            
+                suptitle = "Day/Hour Median Noise levels %s\n"
+                suptitle += "Station %s - [%s] Hz"
+                plt.suptitle(suptitle % (sitedesc,
+                                         channelcode[:]+main[-1],
+                                         band),
+                             fontsize=16)
+                
+                # plt.subplots_adjust(top=0.2)
+                
+                if save is not None:
+                    # fig = ax.figure
+                    fig.savefig("%s-hourly.%s"%(basename,format),
+                                bbox_inches='tight',
+                                facecolor='w')
+                if show:
+                    plt.show()
+
+
+                    
 
 
 if __name__ == "__main__":
