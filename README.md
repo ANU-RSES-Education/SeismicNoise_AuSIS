@@ -48,3 +48,12 @@ from obspy import UTCDateTime
 c = Client("IRIS")
 print(c.get_stations(UTCDateTime(), network="S1", channel="BHZ"))
 ```
+
+### Community indicators
+
+The data and scripts to make this plot are provided in the notebooks directory. 
+
+![community](notebooks/CoronaVirusCommunityIndicators.png)
+
+but this does not automatically update because the searches for the data are not yet fully automated. 
+
