@@ -24,13 +24,13 @@ jobs:
       uses: actions/cache@v1
       env:
       # Increase this value to reset cache if etc/example-environment.yml has not changed
-        CACHE_NUMBER: 1
+        CACHE_NUMBER: 0
       with:
         path: |
           ~/conda_pkgs_dir
           ~/.cache/pip
             
-          key: macos-pdoc-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('.github/workflows/resources/conda_api_docs_environment.yml') }}
+        key: ubuntu-seismo-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('.environment.yml') }}
 
     - name: Miniconda + Cache
       uses: conda-incubator/setup-miniconda@v2
