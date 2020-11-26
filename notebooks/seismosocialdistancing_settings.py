@@ -7,13 +7,15 @@ from obspy import UTCDateTime
 
 # Set these values to control the notebook behaviour
 
-# For demonstration purposes, a 10 week rolling window
+# Make sure you take at least a full week (>=7 days) before the first "ban"
+# (These are hard-wired around the bans in the setting below)
 
-start = UTCDateTime() - 70*24*3600
+start = UTCDateTime("2019-12-01")
 
 # Leaving UTCDateTime() empty means "now":
 # and this means 24 hours ago: UTCDateTime() - 24*3600
-end = UTCDateTime() - 24*3600
+end = UTCDateTime("2020-06-15")
+
 
 
 # This is the time it takes to be sure the data that we download is a complete record that
