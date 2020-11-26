@@ -19,14 +19,28 @@ jobs:
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
-  
-    - uses: goanpeca/setup-miniconda@v1.5.0
+    
+    - name: Cache conda
+      uses: actions/cache@v1
+      env:
+      # Increase this value to reset cache if etc/example-environment.yml has not changed
+        CACHE_NUMBER: 1
       with:
-        auto-update-conda: true
-        python-version: 3.7
-        activate-environment: ausis
-        environment-file: environment.yml
-        auto-activate-base: false
+        path: |
+          ~/conda_pkgs_dir
+          ~/.cache/pip
+            
+          key: macos-pdoc-conda-${{ env.CACHE_NUMBER }}-${{ hashFiles('.github/workflows/resources/conda_api_docs_environment.yml') }}
+
+    - name: Miniconda + Cache
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+          miniconda-version: "latest"
+          environment-file: environment.yml
+          activate-environment: ausis
+          python-version: 3.7
+          use-only-tar-bz2: true # IMPORTANT: This needs to be set for caching to work properly!
+
 
     - name: Install dependencies with conda # (the shell line is needed for conda paths etc)
       shell: bash -l {0}
