@@ -417,7 +417,7 @@ def sitemap(mseedid,
 
 def pivot_for_hourmap(data, columns="angles"):
     band = data.columns[0]
-    data["day"] = [d.year * 365 + d.dayofyear for d in data.index]
+    data["day"] = [d.year * 3650 + d.dayofyear for d in data.index]
     data["time"] = [d.hour + d.minute / 60. for d in data.index]
 
     data = data.pivot(index="day", columns="time", values=band)
